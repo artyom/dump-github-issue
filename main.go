@@ -9,6 +9,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/google/go-github/v62/github"
 )
@@ -34,6 +35,16 @@ func run(ctx context.Context, url string) error {
 		return err
 	}
 	client := github.NewClient(nil).WithAuthToken(token)
+
+	if p.isPr {
+		raw, _, err := client.PullRequests.GetRaw(ctx, p.org, p.repo, p.issueNumber, github.RawOptions{Type: github.Diff})
+		if err != nil {
+			return err
+		}
+		_, err = os.Stdout.WriteString(raw)
+		return err
+	}
+
 	issue, _, err := client.Issues.Get(ctx, p.org, p.repo, p.issueNumber)
 	if err != nil {
 		return err
@@ -84,9 +95,10 @@ type issueParams struct {
 	org         string
 	repo        string
 	issueNumber int
+	isPr        bool
 }
 
-var githubIssueUrl = regexp.MustCompile(`^https://github\.com/([\w-]+)/([\w-]+)/issues/(\d+)$`)
+var githubIssueUrl = regexp.MustCompile(`^https://github\.com/([\w-]+)/([\w-]+)/(?:issues|pull)/(\d+)$`)
 
 func parseUrl(s string) (*issueParams, error) {
 	m := githubIssueUrl.FindStringSubmatch(s)
@@ -101,5 +113,6 @@ func parseUrl(s string) (*issueParams, error) {
 		org:         m[1],
 		repo:        m[2],
 		issueNumber: n,
+		isPr:        strings.Contains(s, "/pull/"),
 	}, nil
 }
