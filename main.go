@@ -98,7 +98,7 @@ type issueParams struct {
 	isPr        bool
 }
 
-var githubIssueUrl = regexp.MustCompile(`^https://github\.com/([\w-]+)/([\w-]+)/(?:issues|pull)/(\d+)$`)
+var githubIssueUrl = regexp.MustCompile(`^\Qhttps://github.com/\E([\w-]+)/([\w-]+)/(?:issues|pull)/(\d+)$`)
 
 func parseUrl(s string) (*issueParams, error) {
 	m := githubIssueUrl.FindStringSubmatch(s)
