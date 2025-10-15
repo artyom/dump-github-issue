@@ -30,7 +30,7 @@ func run(ctx context.Context, url string) error {
 	if token == "" {
 		return errors.New("please set GITHUB_TOKEN env")
 	}
-	p, err := parseUrl(url)
+	p, err := parseURL(url)
 	if err != nil {
 		return err
 	}
@@ -98,15 +98,15 @@ type issueParams struct {
 	isPr        bool
 }
 
-var githubIssueUrl = regexp.MustCompile(`^\Qhttps://github.com/\E([\w-]+)/([\w-]+)/(?:issues|pull)/(\d+)$`)
+var githubIssueURL = regexp.MustCompile(`^\Qhttps://github.com/\E([\w-]+)/([\w-]+)/(?:issues|pull)/(\d+)$`)
 
-func parseUrl(s string) (*issueParams, error) {
+func parseURL(s string) (*issueParams, error) {
 	if i := strings.IndexByte(s, '#'); i != -1 { // strip fragment if present
 		s = s[:i]
 	}
-	m := githubIssueUrl.FindStringSubmatch(s)
+	m := githubIssueURL.FindStringSubmatch(s)
 	if m == nil {
-		return nil, fmt.Errorf("%q does not match %v", s, githubIssueUrl)
+		return nil, fmt.Errorf("%q does not match %v", s, githubIssueURL)
 	}
 	n, err := strconv.Atoi(m[3])
 	if err != nil {
