@@ -101,6 +101,9 @@ type issueParams struct {
 var githubIssueUrl = regexp.MustCompile(`^\Qhttps://github.com/\E([\w-]+)/([\w-]+)/(?:issues|pull)/(\d+)$`)
 
 func parseUrl(s string) (*issueParams, error) {
+	if i := strings.IndexByte(s, '#'); i != -1 { // strip fragment if present
+		s = s[:i]
+	}
 	m := githubIssueUrl.FindStringSubmatch(s)
 	if m == nil {
 		return nil, fmt.Errorf("%q does not match %v", s, githubIssueUrl)
